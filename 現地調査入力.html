@@ -1,0 +1,1170 @@
+<title>現地調査入力 | Bellstrut</title>
+<style>
+  :root {
+    --bg: #f5f7f1;
+    --surface: #ffffff;
+    --surface-alt: #eef2ea;
+    --surface-sunken: #e7ebe0;
+    --text: #16241a;
+    --text-muted: #5b6a5e;
+    --border: #dde3d6;
+    --accent: #1f4a37;
+    --accent-deep: #123326;
+    --accent-contrast: #ffffff;
+    --accent-soft: #e2ede6;
+    --gold: #a2792c;
+    --gold-soft: #f1e6c9;
+    --danger: #a8412a;
+    --danger-soft: #f6e3dd;
+    --focus-ring: #1f4a37;
+    --shadow: rgba(20, 30, 22, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1712;
+      --surface: #16241c;
+      --surface-alt: #1c2c22;
+      --surface-sunken: #101c15;
+      --text: #eef3ec;
+      --text-muted: #9db0a2;
+      --border: #2a3b30;
+      --accent: #5aa47c;
+      --accent-deep: #081c13;
+      --accent-contrast: #08150f;
+      --accent-soft: #1d3327;
+      --gold: #d9b568;
+      --gold-soft: #3a301c;
+      --danger: #e0836a;
+      --danger-soft: #3a231c;
+      --focus-ring: #7fc39d;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1712;
+    --surface: #16241c;
+    --surface-alt: #1c2c22;
+    --surface-sunken: #101c15;
+    --text: #eef3ec;
+    --text-muted: #9db0a2;
+    --border: #2a3b30;
+    --accent: #5aa47c;
+    --accent-deep: #081c13;
+    --accent-contrast: #08150f;
+    --accent-soft: #1d3327;
+    --gold: #d9b568;
+    --gold-soft: #3a301c;
+    --danger: #e0836a;
+    --danger-soft: #3a231c;
+    --focus-ring: #7fc39d;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+  .page {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Yu Gothic", monospace;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+  body { background: var(--bg); margin: 0; }
+
+  .hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 130%);
+    color: var(--accent-contrast);
+    padding: clamp(20px, 6vw, 32px) clamp(18px, 6vw, 28px) 26px;
+    border-bottom: 3px solid var(--gold);
+  }
+  .hero-inner { max-width: 640px; margin: 0 auto; }
+  .eyebrow {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .hero h1 {
+    margin: 0 0 6px;
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
+    text-wrap: balance;
+    letter-spacing: 0.01em;
+  }
+  .hero-sub { margin: 0; opacity: 0.86; font-size: 0.92rem; }
+
+  .draft-banner {
+    max-width: 640px;
+    margin: 14px auto 0;
+    padding: 10px 14px;
+    background: var(--gold-soft);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.86rem;
+  }
+  .draft-banner button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.84rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 4px;
+  }
+
+  main.form {
+    max-width: 640px;
+    margin: 18px auto 0;
+    padding: 0 clamp(14px, 4vw, 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px clamp(14px, 4vw, 20px) 20px;
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .badge {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.86rem;
+  }
+  .card-head svg { flex: none; color: var(--gold); }
+  .card-head h2 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+  .card-note { margin: -8px 0 14px; font-size: 0.8rem; color: var(--text-muted); }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 12px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .field.span-2 { grid-column: 1 / -1; }
+  .field label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+  }
+  .field label .req { color: var(--danger); font-size: 0.75rem; }
+  .field input, .field select, .field textarea {
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 11px;
+    width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 64px; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 1px;
+    border-color: var(--focus-ring);
+  }
+  .field.has-error input, .field.has-error select { border-color: var(--danger); }
+  .err-msg { font-size: 0.76rem; color: var(--danger); min-height: 0; }
+  .unit-suffix { position: relative; }
+  .unit-suffix span {
+    position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+    font-size: 0.78rem; color: var(--text-muted); pointer-events: none;
+  }
+  .unit-suffix input { padding-right: 34px; }
+
+  .calc-readout {
+    margin-top: 4px;
+    background: var(--surface-alt);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .calc-readout .label { font-size: 0.82rem; color: var(--text-muted); }
+  .calc-readout .value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--accent);
+  }
+
+  .checkbox-list { display: flex; flex-direction: column; gap: 8px; }
+  .checkbox-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-alt); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; cursor: pointer;
+  }
+  .checkbox-item input[type="checkbox"] {
+    width: 20px; height: 20px; flex: none; accent-color: var(--accent); cursor: pointer;
+  }
+  .checkbox-item span { font-size: 0.92rem; }
+  .checkbox-item:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .checkbox-item input:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  .dynamic-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .dyn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 8px;
+    align-items: end;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .dyn-row.two-col { grid-template-columns: 1fr 1fr auto; }
+  .dyn-row .mini-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dyn-row .mini-field label { font-size: 0.7rem; color: var(--text-muted); }
+  .dyn-row input {
+    font-family: inherit; font-size: 16px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 9px; width: 100%;
+  }
+  .dyn-row input:focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+  .row-remove {
+    flex: none; width: 36px; height: 36px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--danger); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .row-remove:hover, .row-remove:focus-visible { background: var(--danger-soft); outline: none; }
+
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; color: var(--accent);
+    border: 1.5px dashed var(--accent);
+    border-radius: 9px; padding: 9px 14px;
+    font-size: 0.86rem; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-add:hover, .btn-add:focus-visible { background: var(--accent-soft); outline: none; }
+  .btn-add[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .btn-add + .btn-add { margin-left: 8px; }
+  .list-limit-note { font-size: 0.74rem; color: var(--text-muted); margin: 6px 0 0; }
+
+  .subtotal-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;
+  }
+  .subtotal-row strong {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    color: var(--text); font-size: 0.94rem;
+  }
+
+  .group-title {
+    font-size: 0.86rem; font-weight: 700; color: var(--text);
+    margin: 4px 0 8px;
+  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .summary-card { background: var(--surface-alt); }
+  .summary-list { display: flex; flex-direction: column; gap: 8px; }
+  .summary-list .row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+  }
+  .summary-list .row:last-child { border-bottom: none; }
+  .summary-list .row .k { font-size: 0.86rem; color: var(--text-muted); }
+  .summary-list .row .v {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-weight: 700; font-size: 1rem;
+  }
+
+  .action-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px clamp(14px, 4vw, 20px) calc(10px + env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 10px;
+    max-width: 640px; margin: 20px auto 0;
+  }
+  .helper-note {
+    max-width: 640px; margin: 0 auto; padding: 0 clamp(14px, 4vw, 20px);
+    font-size: 0.78rem; color: var(--text-muted); text-align: center;
+  }
+  .btn {
+    font-family: inherit; font-size: 0.94rem; font-weight: 700;
+    border-radius: 10px; padding: 13px 16px; cursor: pointer;
+    flex: 1; border: 1px solid transparent;
+  }
+  .btn-ghost { background: var(--surface-alt); color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover, .btn-ghost:focus-visible { background: var(--surface-sunken); outline: none; }
+  .btn-primary { background: var(--gold); color: #1c1404; }
+  .btn-primary:hover, .btn-primary:focus-visible { filter: brightness(1.06); outline: none; }
+  .btn-primary:active { filter: brightness(0.96); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    background: var(--text); color: var(--bg);
+    padding: 11px 18px; border-radius: 10px; font-size: 0.86rem;
+    max-width: 88vw; text-align: center; z-index: 40;
+    box-shadow: 0 6px 18px var(--shadow);
+  }
+  .toast.error { background: var(--danger); color: #fff; }
+  .toast.success { background: var(--accent); color: var(--accent-contrast); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: flex-end; justify-content: center; z-index: 50;
+    padding: 0;
+  }
+  @media (min-width: 560px) { .modal-overlay { align-items: center; padding: 16px; } }
+  .modal {
+    background: var(--surface); color: var(--text);
+    border-radius: 16px 16px 0 0; padding: 20px; max-width: 560px; width: 100%;
+    max-height: 82vh; overflow-y: auto;
+  }
+  @media (min-width: 560px) { .modal { border-radius: 16px; } }
+  .modal h3 { margin: 0 0 8px; font-size: 1.02rem; }
+  .modal p { font-size: 0.86rem; color: var(--text-muted); margin: 0 0 12px; }
+  .modal textarea {
+    width: 100%; min-height: 200px; font-family: var(--font-mono); font-size: 0.78rem;
+    background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px; color: var(--text);
+  }
+  .modal .modal-actions { display: flex; gap: 10px; margin-top: 14px; }
+
+  @media (max-width: 420px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .dyn-row { grid-template-columns: 1fr 1fr; }
+    .dyn-row .row-remove { grid-column: 1 / -1; width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+
+<div class="page" lang="ja">
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Bellstrut Site Survey</p>
+      <h1>現地調査入力</h1>
+      <p class="hero-sub">その場で採寸 → 保存したファイルを事務所へ送るだけ</p>
+    </div>
+  </header>
+
+  <div id="draftBanner" class="draft-banner" hidden>
+    <span>前回の下書きを復元しました</span>
+    <button type="button" id="discardDraft">破棄して新規入力</button>
+  </div>
+
+  <main class="form" id="formRoot">
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">1</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
+        <h2>基本情報</h2>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="surveyDate">調査日</label>
+          <input type="date" id="surveyDate">
+        </div>
+        <div class="field">
+          <label for="staff">担当者<span class="req">必須</span></label>
+          <select id="staff">
+            <option value="">選択してください</option>
+            <option>今宿清元</option>
+            <option>上野鈴太郎</option>
+            <option>上野匡太郎</option>
+          </select>
+          <p class="err-msg" id="err-staff"></p>
+        </div>
+        <div class="field span-2">
+          <label for="customerName">顧客名<span class="req">必須</span></label>
+          <input type="text" id="customerName" placeholder="例：山田太郎">
+          <p class="err-msg" id="err-customerName"></p>
+        </div>
+        <div class="field span-2">
+          <label for="address">住所</label>
+          <input type="text" id="address" placeholder="例：愛知県名古屋市中村区名駅1-1-1">
+        </div>
+        <div class="field span-2">
+          <label for="memo">備考・現場メモ</label>
+          <textarea id="memo" placeholder="例：外壁はALCパネル。シールは既存撤去の上、打ち替え。"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">2</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg>
+        <h2>外壁・屋根の仕様</h2>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="wallType">外壁材質<span class="req">必須</span></label>
+          <select id="wallType">
+            <option value="">選択してください</option>
+            <option>ALC</option>
+            <option>サイディング</option>
+            <option>モルタル</option>
+            <option>タイル・レンガ調</option>
+          </select>
+          <p class="err-msg" id="err-wallType"></p>
+        </div>
+        <div class="field">
+          <label for="roofType">屋根材質<span class="req">必須</span></label>
+          <select id="roofType">
+            <option value="">選択してください</option>
+            <option>スレート</option>
+            <option>瓦</option>
+            <option>トタン</option>
+          </select>
+          <p class="err-msg" id="err-roofType"></p>
+        </div>
+      </div>
+      <p class="card-note">グレード（標準／高耐久）は事務所で見積書作成時に選択します。ここでは入力不要です。</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">3</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v3M11 9v3M15 9v3"/></svg>
+        <h2>建物の寸法</h2>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="nagate">長手<span class="req">必須</span></label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="nagate"><span>m</span></div>
+          <p class="err-msg" id="err-nagate"></p>
+        </div>
+        <div class="field">
+          <label for="kokute">短手<span class="req">必須</span></label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="kokute"><span>m</span></div>
+          <p class="err-msg" id="err-kokute"></p>
+        </div>
+        <div class="field">
+          <label for="peakHeight">頂点の高さ<span class="req">必須</span></label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="peakHeight"><span>m</span></div>
+          <p class="err-msg" id="err-peakHeight"></p>
+        </div>
+        <div class="field">
+          <label for="eaveHeight">軒天までの高さ<span class="req">必須</span></label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="eaveHeight"><span>m</span></div>
+          <p class="err-msg" id="err-eaveHeight"></p>
+        </div>
+        <div class="field span-2">
+          <label for="roofArea">屋根塗装面積（目測）</label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="roofArea"><span>m2</span></div>
+        </div>
+      </div>
+      <div class="calc-readout">
+        <span class="label">外周（自動計算）</span>
+        <span class="value" id="calcPerimeter">-- m</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">4</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M12 4v16M4 12h16"/></svg>
+        <h2>窓・ドア（開口部）</h2>
+      </div>
+      <p class="group-title">窓</p>
+      <div class="dynamic-list" id="windowList"></div>
+      <button type="button" class="btn-add" id="addWindow">＋ 窓を追加</button>
+      <p class="list-limit-note">幅・高さは実寸をそのまま入力してください（例：幅800 高さ1200）。最大20ヵ所まで追加できます</p>
+
+      <hr class="divider">
+
+      <p class="group-title">玄関ドア（1ヵ所）</p>
+      <div class="field-grid">
+        <div class="field">
+          <label for="doorWidth">幅</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorWidth"><span>cm</span></div>
+        </div>
+        <div class="field">
+          <label for="doorHeight">高さ</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorHeight"><span>cm</span></div>
+        </div>
+      </div>
+
+      <div class="calc-readout">
+        <span class="label">開口部 合計面積（自動計算）</span>
+        <span class="value" id="calcOpeningArea">-- m2</span>
+      </div>
+      <div class="calc-readout">
+        <span class="label">冊子廻り シール長さ（自動計算）</span>
+        <span class="value" id="calcWindowSeal">-- m</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">5</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M6 6v11a2 2 0 0 0 2 2h2M18 6v11a2 2 0 0 1-2 2h-2"/><path d="M10 19v2M14 19v2"/></svg>
+        <h2>軒樋・縦樋</h2>
+      </div>
+      <p class="group-title">軒樋（最大4件）</p>
+      <div class="dynamic-list" id="eaveGutterList"></div>
+      <button type="button" class="btn-add" id="addEaveGutter">＋ 軒樋を追加</button>
+      <div class="subtotal-row"><span>軒樋 小計</span><strong id="subEaveGutter">0 m</strong></div>
+
+      <hr class="divider">
+
+      <p class="group-title">縦樋（最大4件）</p>
+      <div class="dynamic-list" id="downGutterList"></div>
+      <button type="button" class="btn-add" id="addDownGutter">＋ 縦樋を追加</button>
+      <div class="subtotal-row"><span>縦樋 小計</span><strong id="subDownGutter">0 m</strong></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">6</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M3 16h18" stroke-dasharray="2 3"/></svg>
+        <h2>目地・シーリング</h2>
+      </div>
+      <p class="card-note">グレードは常に【高】固定です</p>
+      <p class="group-title">目地（最大6件）</p>
+      <div class="dynamic-list" id="jointList"></div>
+      <button type="button" class="btn-add" id="addJoint">＋ 目地を追加</button>
+      <div class="subtotal-row"><span>目地 小計</span><strong id="subJoint">0 m</strong></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">7</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 1 5.4-5.4l-2.6 2.6-2-2z"/></svg>
+        <h2>その他付帯部</h2>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="mizukiri">水切り</label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="mizukiri"><span>m</span></div>
+        </div>
+        <div class="field">
+          <label for="hafu">破風板</label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="hafu"><span>m</span></div>
+        </div>
+        <div class="field">
+          <label for="coolerSleeve">クーラースリーブ</label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="coolerSleeve"><span>m</span></div>
+        </div>
+        <div class="field">
+          <label for="shutterBox">シャッターBOX</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="shutterBox"><span>箇所</span></div>
+        </div>
+        <div class="field">
+          <label for="shutterLarge">雨戸大</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="shutterLarge"><span>枚</span></div>
+        </div>
+        <div class="field">
+          <label for="shutterSmall">雨戸小</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="shutterSmall"><span>枚</span></div>
+        </div>
+        <div class="field">
+          <label for="eaves">軒天</label>
+          <select id="eaves">
+            <option value="">選択してください</option>
+            <option>有</option>
+            <option>無</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tanbaHisashi">天端・庇</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="tanbaHisashi"><span>箇所</span></div>
+        </div>
+        <div class="field">
+          <label for="ductBox">ダクトボックス</label>
+          <select id="ductBox">
+            <option value="">選択してください</option>
+            <option>有</option>
+            <option>無</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">8</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s7 7.3 7 12a7 7 0 0 1-14 0c0-4.7 7-12 7-12z"/></svg>
+        <h2>バルコニー防水</h2>
+      </div>
+      <p class="card-note">バルコニーの数だけ、サイズ別に個数を入力してください（無い場合は空欄のまま）</p>
+      <div class="field-grid">
+        <div class="field">
+          <label for="balconyLarge">大</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="balconyLarge"><span>個</span></div>
+        </div>
+        <div class="field">
+          <label for="balconyMedium">中</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="balconyMedium"><span>個</span></div>
+        </div>
+        <div class="field">
+          <label for="balconySmall">小</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="balconySmall"><span>個</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="badge">9</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h2>サービス工事</h2>
+      </div>
+      <p class="card-note">該当するものにチェックしてください。選んだ項目はすべて1式で見積書に反映されます。</p>
+      <div class="checkbox-list" id="serviceWorkList"></div>
+    </section>
+
+    <section class="card summary-card">
+      <div class="card-head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16M7 15l3-4 3 3 4-6"/></svg>
+        <h2>自動計算プレビュー</h2>
+      </div>
+      <div class="summary-list">
+        <div class="row"><span class="k">外周</span><span class="v" id="pvPerimeter">--</span></div>
+        <div class="row"><span class="k">外壁塗装面積</span><span class="v" id="pvWallArea">--</span></div>
+        <div class="row"><span class="k">高圧洗浄面積</span><span class="v" id="pvWashArea">--</span></div>
+        <div class="row"><span class="k">足場面積（目安）</span><span class="v" id="pvScaffoldArea">--</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <p class="helper-note">「登録する」を押すとCSVファイルがスマホに保存されます。事務所へLINE等で送ってください。</p>
+  <div class="action-bar">
+    <button type="button" class="btn btn-ghost" id="saveDraftBtn">下書き保存</button>
+    <button type="button" class="btn btn-primary" id="submitBtn">登録する</button>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+<div id="modalHost"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var MAX_WINDOWS = 20, MAX_GUTTER = 4, MAX_JOINT = 6;
+  // 単価マスターの「サービス工事」区分と完全一致させること（Excel側の項目名と1文字でも違うと単価が引けなくなる）
+  var SERVICE_ITEMS = [
+    "軒天ボード張替え", "ベランダ屋根清掃", "外構高圧洗浄", "外壁補修", "屋根板金",
+    "軒樋清掃", "一階裏面の不用品回収", "バルコニー手摺清掃", "カーポート美装工事",
+    "門戸等洗浄", "カーポート脱着・洗浄"
+  ];
+  var windows = [];
+  var eaveGutters = [];
+  var downGutters = [];
+  var joints = [];
+  var rowSeq = 0;
+
+  var SCALAR_IDS = ["surveyDate","staff","customerName","address","memo","wallType","roofType",
+    "nagate","kokute","peakHeight","eaveHeight","roofArea","doorWidth","doorHeight",
+    "mizukiri","hafu","coolerSleeve","shutterBox","shutterLarge","shutterSmall","eaves",
+    "tanbaHisashi","ductBox","balconyLarge","balconyMedium","balconySmall"];
+
+  function $(id) { return document.getElementById(id); }
+  function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+  function round2(v) { return Math.round(v * 100) / 100; }
+
+  // ---------- dynamic row rendering ----------
+  function trashSvg() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg>';
+  }
+
+  function windowRowHtml(row) {
+    var area = round2((num(row.w) * num(row.h) / 1000000) * num(row.n || 1));
+    return '<div class="dyn-row" data-id="' + row.id + '">' +
+      '<div class="mini-field"><label>幅</label><input type="number" inputmode="numeric" step="1" min="0" value="' + row.w + '" data-field="w"></div>' +
+      '<div class="mini-field"><label>高さ</label><input type="number" inputmode="numeric" step="1" min="0" value="' + row.h + '" data-field="h"></div>' +
+      '<div class="mini-field"><label data-arealabel>数量（' + (area > 0 ? area + 'm2' : '--') + '）</label><input type="number" inputmode="numeric" step="1" min="1" value="' + row.n + '" data-field="n"></div>' +
+      '<button type="button" class="row-remove" data-remove aria-label="この窓を削除">' + trashSvg() + '</button>' +
+      '</div>';
+  }
+  function renderWindowList() {
+    $("windowList").innerHTML = windows.map(windowRowHtml).join("");
+    $("addWindow").disabled = windows.length >= MAX_WINDOWS;
+  }
+
+  function renderGutterList(container, arr, unitLabel) {
+    container.innerHTML = arr.map(function (row) {
+      return '<div class="dyn-row two-col" data-id="' + row.id + '">' +
+        '<div class="mini-field"><label>長さ(m)</label><input type="number" inputmode="decimal" step="0.01" min="0" value="' + row.m + '" data-field="m"></div>' +
+        '<div class="mini-field"><label>本数</label><input type="number" inputmode="numeric" step="1" min="0" value="' + row.n + '" data-field="n"></div>' +
+        '<button type="button" class="row-remove" data-remove aria-label="この' + unitLabel + 'を削除">' + trashSvg() + '</button>' +
+        '</div>';
+    }).join("");
+  }
+
+  function renderEaveGutterList() {
+    renderGutterList($("eaveGutterList"), eaveGutters, "軒樋");
+    $("addEaveGutter").disabled = eaveGutters.length >= MAX_GUTTER;
+  }
+  function renderDownGutterList() {
+    renderGutterList($("downGutterList"), downGutters, "縦樋");
+    $("addDownGutter").disabled = downGutters.length >= MAX_GUTTER;
+  }
+  function renderJointList() {
+    renderGutterList($("jointList"), joints, "目地");
+    $("addJoint").disabled = joints.length >= MAX_JOINT;
+  }
+
+  function addRow(arr, extra) {
+    rowSeq += 1;
+    var row = Object.assign({ id: "r" + rowSeq }, extra);
+    arr.push(row);
+    return row;
+  }
+
+  $("addWindow").addEventListener("click", function () {
+    if (windows.length >= MAX_WINDOWS) return;
+    addRow(windows, { w: "", h: "", n: 1 });
+    renderWindowList();
+  });
+  $("addEaveGutter").addEventListener("click", function () {
+    if (eaveGutters.length >= MAX_GUTTER) return;
+    addRow(eaveGutters, { m: "", n: "" });
+    renderEaveGutterList();
+  });
+  $("addDownGutter").addEventListener("click", function () {
+    if (downGutters.length >= MAX_GUTTER) return;
+    addRow(downGutters, { m: "", n: "" });
+    renderDownGutterList();
+  });
+  $("addJoint").addEventListener("click", function () {
+    if (joints.length >= MAX_JOINT) return;
+    addRow(joints, { m: "", n: "" });
+    renderJointList();
+  });
+
+  function wireDynamicContainer(containerId, arr, rerender) {
+    var container = $(containerId);
+    container.addEventListener("input", function (e) {
+      var field = e.target.getAttribute("data-field");
+      if (!field) return;
+      var rowEl = e.target.closest("[data-id]");
+      var row = arr.find(function (r) { return r.id === rowEl.getAttribute("data-id"); });
+      if (!row) return;
+      row[field] = e.target.value;
+      recalc();
+    });
+    container.addEventListener("click", function (e) {
+      if (!e.target.closest("[data-remove]")) return;
+      var rowEl = e.target.closest("[data-id]");
+      var id = rowEl.getAttribute("data-id");
+      var idx = arr.findIndex(function (r) { return r.id === id; });
+      if (idx >= 0) arr.splice(idx, 1);
+      rerender();
+      recalc();
+    });
+  }
+
+  // windowList gets a dedicated handler: it shows a live per-row area label,
+  // so on input we patch that label in place instead of re-rendering the
+  // whole list (a full re-render would drop keyboard focus mid-keystroke).
+  $("windowList").addEventListener("input", function (e) {
+    var field = e.target.getAttribute("data-field");
+    if (!field) return;
+    var rowEl = e.target.closest("[data-id]");
+    var row = windows.find(function (r) { return r.id === rowEl.getAttribute("data-id"); });
+    if (!row) return;
+    row[field] = e.target.value;
+    var area = round2((num(row.w) * num(row.h) / 1000000) * num(row.n || 1));
+    var label = rowEl.querySelector("[data-arealabel]");
+    if (label) label.textContent = "数量（" + (area > 0 ? area + "m2" : "--") + "）";
+    recalc();
+  });
+  $("windowList").addEventListener("click", function (e) {
+    if (!e.target.closest("[data-remove]")) return;
+    var rowEl = e.target.closest("[data-id]");
+    var id = rowEl.getAttribute("data-id");
+    var idx = windows.findIndex(function (r) { return r.id === id; });
+    if (idx >= 0) windows.splice(idx, 1);
+    renderWindowList();
+    recalc();
+  });
+
+  wireDynamicContainer("eaveGutterList", eaveGutters, renderEaveGutterList);
+  wireDynamicContainer("downGutterList", downGutters, renderDownGutterList);
+  wireDynamicContainer("jointList", joints, renderJointList);
+
+  // ---------- calculations ----------
+  function sumLenCount(arr) {
+    return round2(arr.reduce(function (t, r) { return t + num(r.m) * num(r.n); }, 0));
+  }
+
+  function computeAll() {
+    var nagate = num($("nagate").value);
+    var kokute = num($("kokute").value);
+    var peak = num($("peakHeight").value);
+    var eaveH = num($("eaveHeight").value);
+    var roofArea = num($("roofArea").value);
+    var perimeter = round2(2 * (nagate + kokute));
+
+    var openingArea = 0, jointAroundOpenings = 0;
+    windows.forEach(function (r) {
+      // 窓の幅・高さは実寸(mm)で入力される。玄関ドアはcm入力のため換算式が異なる点に注意。
+      var w = num(r.w), h = num(r.h), n = num(r.n || 1);
+      openingArea += (w * h / 1000000) * n;
+      jointAroundOpenings += ((w + h) / 1000 * 2) * n;
+    });
+    var doorW = num($("doorWidth").value), doorH = num($("doorHeight").value);
+    if (doorW > 0 && doorH > 0) {
+      openingArea += doorW * doorH / 10000;
+      jointAroundOpenings += (doorW + doorH) / 100 * 2;
+    }
+    openingArea = round2(openingArea);
+    jointAroundOpenings = round2(jointAroundOpenings);
+
+    var wallArea = round2(perimeter * eaveH - openingArea);
+    if (wallArea < 0) wallArea = 0;
+    var washArea = round2(wallArea + roofArea);
+    var scaffoldArea = round2(perimeter * (peak + 1.0));
+
+    return {
+      perimeter: perimeter, openingArea: openingArea, jointAroundOpenings: jointAroundOpenings,
+      wallArea: wallArea, washArea: washArea, scaffoldArea: scaffoldArea,
+      eaveGutterLen: sumLenCount(eaveGutters), downGutterLen: sumLenCount(downGutters), jointLen: sumLenCount(joints)
+    };
+  }
+
+  function recalc() {
+    var c = computeAll();
+    $("calcPerimeter").textContent = c.perimeter > 0 ? c.perimeter + " m" : "-- m";
+    $("calcOpeningArea").textContent = c.openingArea > 0 ? c.openingArea + " m2" : "-- m2";
+    $("calcWindowSeal").textContent = c.jointAroundOpenings > 0 ? c.jointAroundOpenings + " m" : "-- m";
+    $("subEaveGutter").textContent = c.eaveGutterLen + " m";
+    $("subDownGutter").textContent = c.downGutterLen + " m";
+    $("subJoint").textContent = c.jointLen + " m";
+    $("pvPerimeter").textContent = c.perimeter > 0 ? c.perimeter + " m" : "--";
+    $("pvWallArea").textContent = c.wallArea > 0 ? c.wallArea + " m2" : "--";
+    $("pvWashArea").textContent = c.washArea > 0 ? c.washArea + " m2" : "--";
+    $("pvScaffoldArea").textContent = c.scaffoldArea > 0 ? c.scaffoldArea + " m2" : "--";
+  }
+
+  document.getElementById("formRoot").addEventListener("input", function (e) {
+    if (SCALAR_IDS.indexOf(e.target.id) !== -1) recalc();
+  });
+
+  // ---------- validation ----------
+  var REQUIRED = ["staff", "customerName", "wallType", "roofType", "nagate", "kokute", "peakHeight", "eaveHeight"];
+  var REQUIRED_MSG = {
+    staff: "担当者を選択してください", customerName: "顧客名を入力してください",
+    wallType: "外壁材質を選択してください", roofType: "屋根材質を選択してください",
+    nagate: "長手を入力してください", kokute: "短手を入力してください",
+    peakHeight: "頂点の高さを入力してください", eaveHeight: "軒天までの高さを入力してください"
+  };
+  function validate() {
+    var firstInvalid = null;
+    REQUIRED.forEach(function (id) {
+      var el = $(id);
+      var field = el.closest(".field");
+      var errEl = $("err-" + id);
+      var invalid;
+      if (el.tagName === "SELECT") {
+        invalid = !el.value;
+      } else if (el.type === "number") {
+        invalid = el.value === "" || num(el.value) <= 0;
+      } else {
+        invalid = el.value.trim() === "";
+      }
+      if (invalid) {
+        field.classList.add("has-error");
+        if (errEl) errEl.textContent = REQUIRED_MSG[id];
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        field.classList.remove("has-error");
+        if (errEl) errEl.textContent = "";
+      }
+    });
+    if (firstInvalid) {
+      firstInvalid.closest(".field").scrollIntoView({ behavior: "smooth", block: "center" });
+      firstInvalid.focus({ preventScroll: true });
+      return false;
+    }
+    return true;
+  }
+
+  // ---------- CSV build ----------
+  function csvField(v) {
+    var s = (v === undefined || v === null) ? "" : String(v);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function buildWindowListText() {
+    return windows
+      .filter(function (r) { return num(r.w) > 0 && num(r.h) > 0; })
+      .map(function (r) { return num(r.w) + "x" + num(r.h) + "x" + num(r.n || 1); })
+      .join("\n");
+  }
+
+  function gutterCols(prefix, arr, max) {
+    var out = {};
+    for (var i = 1; i <= max; i++) {
+      var r = arr[i - 1];
+      out[prefix + i + "_m"] = r ? r.m : "";
+      out[prefix + i + "_本数"] = r ? r.n : "";
+    }
+    return out;
+  }
+
+  function buildCsv() {
+    var v = {};
+    SCALAR_IDS.forEach(function (id) { v[id] = $(id).value; });
+
+    var cols = {
+      "調査日": v.surveyDate, "顧客名": v.customerName, "住所": v.address, "担当者": v.staff,
+      "外壁材質": v.wallType, "屋根材質": v.roofType,
+      "長手m": v.nagate, "短手m": v.kokute, "頂点の高さm": v.peakHeight, "軒天までの高さm": v.eaveHeight,
+      "屋根塗装面積m2": v.roofArea, "窓一覧": buildWindowListText(),
+      "玄関ドア_幅cm": v.doorWidth, "玄関ドア_高さcm": v.doorHeight
+    };
+    Object.assign(cols, gutterCols("軒樋", eaveGutters, MAX_GUTTER));
+    Object.assign(cols, gutterCols("縦樋", downGutters, MAX_GUTTER));
+    Object.assign(cols, {
+      "水切りm": v.mizukiri, "破風板m": v.hafu, "クーラースリーブm": v.coolerSleeve,
+      "シャッターBOX箇所": v.shutterBox, "雨戸大枚": v.shutterLarge, "雨戸小枚": v.shutterSmall, "軒天": v.eaves,
+      "天端庇箇所": v.tanbaHisashi, "ダクトボックス": v.ductBox
+    });
+    Object.assign(cols, gutterCols("目地", joints, MAX_JOINT));
+    Object.assign(cols, {
+      "バルコニー大": v.balconyLarge, "バルコニー中": v.balconyMedium, "バルコニー小": v.balconySmall,
+      "サービス工事一覧": getSelectedServiceItems().join("\n"),
+      "備考": v.memo
+    });
+
+    var headers = Object.keys(cols);
+    var headerLine = headers.map(csvField).join(",");
+    var valueLine = headers.map(function (h) { return csvField(cols[h]); }).join(",");
+    return "﻿" + headerLine + "\r\n" + valueLine + "\r\n";
+  }
+
+  // ---------- toast ----------
+  function showToast(msg, kind) {
+    var host = $("toastHost");
+    host.innerHTML = "";
+    var el = document.createElement("div");
+    el.className = "toast" + (kind ? " " + kind : "");
+    el.textContent = msg;
+    host.appendChild(el);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 4200);
+  }
+
+  // ---------- fallback modal (copy to clipboard) ----------
+  function showFallbackModal(csvText) {
+    var host = $("modalHost");
+    host.innerHTML =
+      '<div class="modal-overlay" id="fbOverlay">' +
+      '<div class="modal">' +
+      '<h3>ファイル保存が使えませんでした</h3>' +
+      '<p>下のテキストを全て選択してコピーし、LINE等で事務所に送ってください。</p>' +
+      '<textarea readonly id="fbText"></textarea>' +
+      '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-ghost" id="fbClose">閉じる</button>' +
+      '<button type="button" class="btn btn-primary" id="fbCopy">コピーする</button>' +
+      '</div></div></div>';
+    $("fbText").value = csvText;
+    $("fbOverlay").addEventListener("click", function (e) { if (e.target.id === "fbOverlay") host.innerHTML = ""; });
+    $("fbClose").addEventListener("click", function () { host.innerHTML = ""; });
+    $("fbCopy").addEventListener("click", function () {
+      $("fbText").select();
+      try {
+        navigator.clipboard.writeText($("fbText").value).then(function () {
+          showToast("コピーしました", "success");
+        }).catch(function () { document.execCommand("copy"); showToast("コピーしました", "success"); });
+      } catch (err) {
+        document.execCommand("copy");
+        showToast("コピーしました", "success");
+      }
+    });
+  }
+
+  function errorMessage(code) {
+    switch (code) {
+      case "declined": return "保存がキャンセルされました。もう一度お試しください。";
+      case "rate_limited": return "少し待ってから、もう一度お試しください。";
+      default: return "保存でエラーが発生しました。";
+    }
+  }
+
+  function safeFileBase(name) {
+    return (name || "顧客").replace(/[\\/:*?"<>|]/g, "").trim() || "顧客";
+  }
+  function todayStamp() {
+    var d = new Date();
+    return d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+  }
+
+  function saveViaCapability(csvText, filenameBase) {
+    return window.claude.downloads.save({ filename: filenameBase + ".csv", data: csvText })
+      .catch(function (err) {
+        if (err && (err.code === "rejected_extension" || err.code === "extension_not_enabled")) {
+          return window.claude.downloads.save({ filename: filenameBase + ".txt", data: csvText });
+        }
+        throw err;
+      });
+  }
+
+  // Claude以外の場所でホスティングした場合（window.claudeが存在しない）の標準ダウンロード。
+  // 通常のブラウザのファイル保存機能を使うため、サインインは不要。
+  function downloadViaBlob(csvText, filenameBase) {
+    try {
+      var blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filenameBase + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // ---------- draft (localStorage) ----------
+  var DRAFT_KEY = "bellstrut_site_survey_draft_v1";
+  function collectDraft() {
+    var v = {};
+    SCALAR_IDS.forEach(function (id) { v[id] = $(id).value; });
+    return {
+      scalars: v, windows: windows, eaveGutters: eaveGutters, downGutters: downGutters, joints: joints,
+      serviceItems: getSelectedServiceItems()
+    };
+  }
+  function applyDraft(draft) {
+    if (!draft) return;
+    Object.keys(draft.scalars || {}).forEach(function (id) {
+      var el = $(id);
+      if (el) el.value = draft.scalars[id];
+    });
+    windows = draft.windows || [];
+    eaveGutters = draft.eaveGutters || [];
+    downGutters = draft.downGutters || [];
+    joints = draft.joints || [];
+    renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList();
+    setSelectedServiceItems(draft.serviceItems);
+    recalc();
+  }
+  $("saveDraftBtn").addEventListener("click", function () {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft()));
+      showToast("下書きを保存しました", "success");
+    } catch (e) {
+      showToast("下書きの保存に失敗しました", "error");
+    }
+  });
+  $("discardDraft").addEventListener("click", function () {
+    localStorage.removeItem(DRAFT_KEY);
+    $("draftBanner").hidden = true;
+  });
+
+  // checkboxes must exist in the DOM before a saved draft can restore their checked state
+  renderServiceWorkList();
+
+  (function restoreDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      applyDraft(JSON.parse(raw));
+      $("draftBanner").hidden = false;
+    } catch (e) { /* ignore corrupt draft */ }
+  })();
+
+  // ---------- submit ----------
+  $("submitBtn").addEventListener("click", function () {
+    if (!validate()) {
+      showToast("未入力の必須項目があります", "error");
+      return;
+    }
+    var csvText = buildCsv();
+    var filenameBase = "現地調査_" + safeFileBase($("customerName").value) + "_" + todayStamp();
+
+    if (!window.claude || !window.claude.downloads) {
+      var ok = downloadViaBlob(csvText, filenameBase);
+      if (ok) {
+        showToast("保存しました。事務所にLINE等で送ってください。", "success");
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      } else {
+        showFallbackModal(csvText);
+      }
+      return;
+    }
+
+    $("submitBtn").disabled = true;
+    saveViaCapability(csvText, filenameBase)
+      .then(function () {
+        showToast("保存しました。事務所にLINE等で送ってください。", "success");
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      })
+      .catch(function (err) {
+        var code = err && err.code;
+        if (code && code !== "declined" && code !== "rate_limited") {
+          showFallbackModal(csvText);
+        } else {
+          showToast(errorMessage(code), "error");
+        }
+      })
+      .finally(function () { $("submitBtn").disabled = false; });
+  });
+
+  // ---------- service work checkboxes ----------
+  function renderServiceWorkList() {
+    var el = $("serviceWorkList");
+    el.innerHTML = SERVICE_ITEMS.map(function (name, i) {
+      return '<label class="checkbox-item"><input type="checkbox" id="svc-' + i + '" data-service="' + name + '"><span>' + name + '</span></label>';
+    }).join("");
+  }
+  function getSelectedServiceItems() {
+    return SERVICE_ITEMS.filter(function (name, i) { return $("svc-" + i).checked; });
+  }
+  function setSelectedServiceItems(list) {
+    var set = {};
+    (list || []).forEach(function (n) { set[n] = true; });
+    SERVICE_ITEMS.forEach(function (name, i) {
+      var el = $("svc-" + i);
+      if (el) el.checked = !!set[name];
+    });
+  }
+
+  // ---------- init ----------
+  if (!$("surveyDate").value) {
+    var d = new Date();
+    $("surveyDate").value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList();
+  recalc();
+})();
+</script>
