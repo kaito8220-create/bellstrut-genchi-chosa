@@ -1053,6 +1053,19 @@
     }
   }
 
+  // iOS Safari等はblobの自動ダウンロードが不安定なため、対応していれば端末標準の共有シート
+  // （そのままLINE等に送れる）を優先し、使えない場合だけ通常のダウンロードにフォールバックする。
+  function shareOrDownload(csvText, filenameBase) {
+    var filename = filenameBase + ".csv";
+    try {
+      var file = new File([csvText], filename, { type: "text/csv" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        return navigator.share({ files: [file], title: filename }).then(function () { return "shared"; });
+      }
+    } catch (e) { /* File非対応やcanShare例外時は下のダウンロードにフォールバック */ }
+    return Promise.resolve(downloadViaBlob(csvText, filenameBase) ? "downloaded" : "failed");
+  }
+
   // ---------- draft (localStorage) ----------
   var DRAFT_KEY = "bellstrut_site_survey_draft_v1";
   function collectDraft() {
@@ -1112,13 +1125,24 @@
     var filenameBase = "現地調査_" + safeFileBase($("customerName").value) + "_" + todayStamp();
 
     if (!window.claude || !window.claude.downloads) {
-      var ok = downloadViaBlob(csvText, filenameBase);
-      if (ok) {
-        showToast("保存しました。事務所にLINE等で送ってください。", "success");
-        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
-      } else {
-        showFallbackModal(csvText);
-      }
+      $("submitBtn").disabled = true;
+      shareOrDownload(csvText, filenameBase)
+        .then(function (result) {
+          if (result === "shared") {
+            showToast("送信しました。", "success");
+            try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+          } else if (result === "downloaded") {
+            showToast("保存しました。事務所にLINE等で送ってください。", "success");
+            try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+          } else {
+            showFallbackModal(csvText);
+          }
+        })
+        .catch(function (err) {
+          if (err && err.name === "AbortError") return; // 共有シートをキャンセルしただけなのでエラー表示しない
+          showFallbackModal(csvText);
+        })
+        .finally(function () { $("submitBtn").disabled = false; });
       return;
     }
 
