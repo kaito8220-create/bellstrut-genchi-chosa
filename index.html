@@ -19,46 +19,7 @@
     --focus-ring: #1f4a37;
     --shadow: rgba(20, 30, 22, 0.10);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0d1712;
-      --surface: #16241c;
-      --surface-alt: #1c2c22;
-      --surface-sunken: #101c15;
-      --text: #eef3ec;
-      --text-muted: #9db0a2;
-      --border: #2a3b30;
-      --accent: #5aa47c;
-      --accent-deep: #081c13;
-      --accent-contrast: #08150f;
-      --accent-soft: #1d3327;
-      --gold: #d9b568;
-      --gold-soft: #3a301c;
-      --danger: #e0836a;
-      --danger-soft: #3a231c;
-      --focus-ring: #7fc39d;
-      --shadow: rgba(0, 0, 0, 0.45);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0d1712;
-    --surface: #16241c;
-    --surface-alt: #1c2c22;
-    --surface-sunken: #101c15;
-    --text: #eef3ec;
-    --text-muted: #9db0a2;
-    --border: #2a3b30;
-    --accent: #5aa47c;
-    --accent-deep: #081c13;
-    --accent-contrast: #08150f;
-    --accent-soft: #1d3327;
-    --gold: #d9b568;
-    --gold-soft: #3a301c;
-    --danger: #e0836a;
-    --danger-soft: #3a231c;
-    --focus-ring: #7fc39d;
-    --shadow: rgba(0, 0, 0, 0.45);
-  }
+  /* 端末のダークモード設定に関わらず、常にこの白背景のライトカラーで固定表示する */
 
   * { box-sizing: border-box; }
   .page {
