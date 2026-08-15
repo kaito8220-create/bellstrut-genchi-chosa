@@ -372,8 +372,9 @@
           <p class="err-msg" id="err-customerName"></p>
         </div>
         <div class="field span-2">
-          <label for="address">住所</label>
+          <label for="address">住所<span class="req">必須</span></label>
           <input type="text" id="address" placeholder="例：愛知県名古屋市中村区名駅1-1-1">
+          <p class="err-msg" id="err-address"></p>
         </div>
         <div class="field span-2">
           <label for="memo">備考・現場メモ</label>
@@ -592,6 +593,10 @@
           <label for="balconySmall">小</label>
           <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="balconySmall"><span>個</span></div>
         </div>
+        <div class="field">
+          <label for="balconyUrethane">ウレタン防水</label>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="balconyUrethane"><span>個</span></div>
+        </div>
       </div>
     </section>
 
@@ -650,7 +655,7 @@
   var SCALAR_IDS = ["surveyDate","staff","customerName","address","memo","wallType","roofType",
     "nagate","kokute","peakHeight","eaveHeight","roofArea","doorWidth","doorHeight",
     "mizukiri","hafu","coolerSleeve","shutterBox","shutterLarge","shutterSmall","eaves",
-    "tanbaHisashi","ductBox","balconyLarge","balconyMedium","balconySmall"];
+    "tanbaHisashi","ductBox","balconyLarge","balconyMedium","balconySmall","balconyUrethane"];
 
   function $(id) { return document.getElementById(id); }
   function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -836,9 +841,10 @@
   });
 
   // ---------- validation ----------
-  var REQUIRED = ["staff", "customerName", "wallType", "nagate", "kokute", "peakHeight", "eaveHeight"];
+  var REQUIRED = ["staff", "customerName", "address", "wallType", "nagate", "kokute", "peakHeight", "eaveHeight"];
   var REQUIRED_MSG = {
     staff: "担当者を選択してください", customerName: "顧客名を入力してください",
+    address: "住所を入力してください",
     wallType: "外壁材質を選択してください",
     nagate: "長手を入力してください", kokute: "短手を入力してください",
     peakHeight: "頂点の高さを入力してください", eaveHeight: "軒天までの高さを入力してください"
@@ -919,6 +925,7 @@
     Object.assign(cols, gutterCols("目地", joints, MAX_JOINT));
     Object.assign(cols, {
       "バルコニー大": v.balconyLarge, "バルコニー中": v.balconyMedium, "バルコニー小": v.balconySmall,
+      "バルコニーウレタン": v.balconyUrethane,
       "サービス工事一覧": getSelectedServiceItems().join("\n"),
       "備考": v.memo
     });
