@@ -411,14 +411,6 @@
           <p class="err-msg" id="err-roofType"></p>
         </div>
         <div class="field">
-          <label for="roofShape">屋根の形</label>
-          <select id="roofShape">
-            <option value="">選択してください</option>
-            <option>寄棟</option>
-            <option>切妻</option>
-          </select>
-        </div>
-        <div class="field">
           <label for="roofPitch">勾配</label>
           <select id="roofPitch">
             <option value="">選択してください</option>
@@ -681,7 +673,7 @@
   var rowSeq = 0;
 
   var SCALAR_IDS = ["surveyDate","staff","customerName","address","memo","wallType","roofType",
-    "roofShape","roofPitch","eaveOverhang",
+    "roofPitch","eaveOverhang",
     "nagate","kokute","peakHeight","eaveHeight","roofArea","doorWidth","doorHeight",
     "mizukiri","hafu","coolerSleeve","shutterBox","shutterLarge","shutterSmall","eaves",
     "tanbaHisashi","ductBox","balconyLarge","balconyMedium","balconySmall","balconyUrethane"];
@@ -939,7 +931,7 @@
 
     var cols = {
       "調査日": v.surveyDate, "顧客名": v.customerName, "住所": v.address, "担当者": v.staff,
-      "外壁材質": v.wallType, "屋根材質": v.roofType, "屋根の形": v.roofShape, "勾配": v.roofPitch, "軒の出mm": v.eaveOverhang,
+      "外壁材質": v.wallType, "屋根材質": v.roofType, "勾配": v.roofPitch, "軒の出mm": v.eaveOverhang,
       "長手m": v.nagate, "短手m": v.kokute, "頂点の高さm": v.peakHeight, "軒天までの高さm": v.eaveHeight,
       "屋根塗装面積m2": v.roofArea, "窓一覧": buildWindowListText(),
       "玄関ドア_幅mm": v.doorWidth, "玄関ドア_高さmm": v.doorHeight
