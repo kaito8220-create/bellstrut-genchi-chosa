@@ -400,9 +400,9 @@
           <p class="err-msg" id="err-wallType"></p>
         </div>
         <div class="field">
-          <label for="roofType">屋根材質<span class="req">必須</span></label>
+          <label for="roofType">屋根材質</label>
           <select id="roofType">
-            <option value="">選択してください</option>
+            <option value="">屋根工事なし（未選択のまま可）</option>
             <option>スレート</option>
             <option>瓦</option>
             <option>トタン</option>
@@ -468,11 +468,11 @@
       <div class="field-grid">
         <div class="field">
           <label for="doorWidth">幅</label>
-          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorWidth"><span>cm</span></div>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorWidth"><span>mm</span></div>
         </div>
         <div class="field">
           <label for="doorHeight">高さ</label>
-          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorHeight"><span>cm</span></div>
+          <div class="unit-suffix"><input type="number" inputmode="numeric" step="1" min="0" id="doorHeight"><span>mm</span></div>
         </div>
       </div>
 
@@ -512,7 +512,7 @@
         <h2>目地・シーリング</h2>
       </div>
       <p class="card-note">グレードは常に【高】固定です</p>
-      <p class="group-title">目地（最大6件）</p>
+      <p class="group-title">目地（最大10件）</p>
       <div class="dynamic-list" id="jointList"></div>
       <button type="button" class="btn-add" id="addJoint">＋ 目地を追加</button>
       <div class="subtotal-row"><span>目地 小計</span><strong id="subJoint">0 m</strong></div>
@@ -634,7 +634,7 @@
 (function () {
   "use strict";
 
-  var MAX_WINDOWS = 20, MAX_GUTTER = 4, MAX_JOINT = 6;
+  var MAX_WINDOWS = 20, MAX_GUTTER = 4, MAX_JOINT = 10;
   // 単価マスターの「サービス工事」区分と完全一致させること（Excel側の項目名と1文字でも違うと単価が引けなくなる）
   var SERVICE_ITEMS = [
     "軒天ボード張替え", "ベランダ屋根清掃", "外構高圧洗浄", "外壁補修", "屋根板金",
@@ -792,15 +792,15 @@
 
     var openingArea = 0, jointAroundOpenings = 0;
     windows.forEach(function (r) {
-      // 窓の幅・高さは実寸(mm)で入力される。玄関ドアはcm入力のため換算式が異なる点に注意。
+      // 窓・玄関ドアとも幅・高さは実寸(mm)で入力される。
       var w = num(r.w), h = num(r.h), n = num(r.n || 1);
       openingArea += (w * h / 1000000) * n;
       jointAroundOpenings += ((w + h) / 1000 * 2) * n;
     });
     var doorW = num($("doorWidth").value), doorH = num($("doorHeight").value);
     if (doorW > 0 && doorH > 0) {
-      openingArea += doorW * doorH / 10000;
-      jointAroundOpenings += (doorW + doorH) / 100 * 2;
+      openingArea += doorW * doorH / 1000000;
+      jointAroundOpenings += (doorW + doorH) / 1000 * 2;
     }
     openingArea = round2(openingArea);
     jointAroundOpenings = round2(jointAroundOpenings);
@@ -836,10 +836,10 @@
   });
 
   // ---------- validation ----------
-  var REQUIRED = ["staff", "customerName", "wallType", "roofType", "nagate", "kokute", "peakHeight", "eaveHeight"];
+  var REQUIRED = ["staff", "customerName", "wallType", "nagate", "kokute", "peakHeight", "eaveHeight"];
   var REQUIRED_MSG = {
     staff: "担当者を選択してください", customerName: "顧客名を入力してください",
-    wallType: "外壁材質を選択してください", roofType: "屋根材質を選択してください",
+    wallType: "外壁材質を選択してください",
     nagate: "長手を入力してください", kokute: "短手を入力してください",
     peakHeight: "頂点の高さを入力してください", eaveHeight: "軒天までの高さを入力してください"
   };
@@ -907,7 +907,7 @@
       "外壁材質": v.wallType, "屋根材質": v.roofType,
       "長手m": v.nagate, "短手m": v.kokute, "頂点の高さm": v.peakHeight, "軒天までの高さm": v.eaveHeight,
       "屋根塗装面積m2": v.roofArea, "窓一覧": buildWindowListText(),
-      "玄関ドア_幅cm": v.doorWidth, "玄関ドア_高さcm": v.doorHeight
+      "玄関ドア_幅mm": v.doorWidth, "玄関ドア_高さmm": v.doorHeight
     };
     Object.assign(cols, gutterCols("軒樋", eaveGutters, MAX_GUTTER));
     Object.assign(cols, gutterCols("縦樋", downGutters, MAX_GUTTER));
