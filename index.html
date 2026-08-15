@@ -207,12 +207,12 @@
   .dyn-row.two-col { grid-template-columns: 1fr 1fr auto; }
   .dyn-row .mini-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .dyn-row .mini-field label { font-size: 0.7rem; color: var(--text-muted); }
-  .dyn-row input {
+  .dyn-row input, .dyn-row select {
     font-family: inherit; font-size: 16px; color: var(--text);
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 8px 9px; width: 100%;
   }
-  .dyn-row input:focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+  .dyn-row input:focus, .dyn-row select:focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
   .row-remove {
     flex: none; width: 36px; height: 36px; border-radius: 8px;
     background: transparent; border: 1px solid var(--border);
@@ -590,6 +590,13 @@
         <label class="checkbox-item"><input type="checkbox" id="ironParts"><span>各所鉄部</span></label>
         <label class="checkbox-item"><input type="checkbox" id="woodParts"><span>各所木部</span></label>
       </div>
+
+      <hr class="divider">
+
+      <p class="group-title">その他項目（自由記述、最大6件）</p>
+      <p class="card-note">単価マスターに無い項目を入力する欄です。単価は自動で入らないため、事務所側で金額を入力します。</p>
+      <div class="dynamic-list" id="customItemList"></div>
+      <button type="button" class="btn-add" id="addCustomItem">＋ 項目を追加</button>
     </section>
 
     <section class="card">
@@ -658,7 +665,8 @@
 (function () {
   "use strict";
 
-  var MAX_WINDOWS = 20, MAX_GUTTER = 4, MAX_JOINT = 10;
+  var MAX_WINDOWS = 20, MAX_GUTTER = 4, MAX_JOINT = 10, MAX_CUSTOM = 6;
+  var CUSTOM_UNITS = ["m", "㎡", "式", "箇所", "枚"];
   // 単価マスターの「サービス工事」区分と完全一致させること（Excel側の項目名と1文字でも違うと単価が引けなくなる）
   var SERVICE_ITEMS = [
     "軒天ボード張替え", "ベランダ屋根清掃", "外構高圧洗浄", "外壁補修", "屋根板金",
@@ -669,6 +677,7 @@
   var eaveGutters = [];
   var downGutters = [];
   var joints = [];
+  var customItems = [];
   var rowSeq = 0;
 
   var SCALAR_IDS = ["surveyDate","staff","customerName","address","memo","wallType","roofType",
@@ -682,6 +691,9 @@
   function $(id) { return document.getElementById(id); }
   function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
   function round2(v) { return Math.round(v * 100) / 100; }
+  function escapeAttr(v) {
+    return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
 
   // ---------- dynamic row rendering ----------
   function trashSvg() {
@@ -725,6 +737,22 @@
     $("addJoint").disabled = joints.length >= MAX_JOINT;
   }
 
+  function customItemRowHtml(row) {
+    var options = CUSTOM_UNITS.map(function (u) {
+      return '<option value="' + u + '"' + (row.unit === u ? " selected" : "") + '>' + u + "</option>";
+    }).join("");
+    return '<div class="dyn-row" data-id="' + row.id + '">' +
+      '<div class="mini-field"><label>品名</label><input type="text" value="' + escapeAttr(row.name) + '" data-field="name"></div>' +
+      '<div class="mini-field"><label>数量</label><input type="number" inputmode="decimal" step="0.01" min="0" value="' + row.qty + '" data-field="qty"></div>' +
+      '<div class="mini-field"><label>単位</label><select data-field="unit">' + options + "</select></div>" +
+      '<button type="button" class="row-remove" data-remove aria-label="この項目を削除">' + trashSvg() + "</button>" +
+      "</div>";
+  }
+  function renderCustomItemList() {
+    $("customItemList").innerHTML = customItems.map(customItemRowHtml).join("");
+    $("addCustomItem").disabled = customItems.length >= MAX_CUSTOM;
+  }
+
   function addRow(arr, extra) {
     rowSeq += 1;
     var row = Object.assign({ id: "r" + rowSeq }, extra);
@@ -751,6 +779,11 @@
     if (joints.length >= MAX_JOINT) return;
     addRow(joints, { m: "", n: "" });
     renderJointList();
+  });
+  $("addCustomItem").addEventListener("click", function () {
+    if (customItems.length >= MAX_CUSTOM) return;
+    addRow(customItems, { name: "", qty: "", unit: CUSTOM_UNITS[0] });
+    renderCustomItemList();
   });
 
   function wireDynamicContainer(containerId, arr, rerender) {
@@ -803,6 +836,7 @@
   wireDynamicContainer("eaveGutterList", eaveGutters, renderEaveGutterList);
   wireDynamicContainer("downGutterList", downGutters, renderDownGutterList);
   wireDynamicContainer("jointList", joints, renderJointList);
+  wireDynamicContainer("customItemList", customItems, renderCustomItemList);
 
   // ---------- calculations ----------
   function sumLenCount(arr) {
@@ -926,6 +960,17 @@
     return out;
   }
 
+  function customItemCols(arr, max) {
+    var out = {};
+    for (var i = 1; i <= max; i++) {
+      var r = arr[i - 1];
+      out["自由項目" + i + "_品名"] = r ? r.name : "";
+      out["自由項目" + i + "_数量"] = r ? r.qty : "";
+      out["自由項目" + i + "_単位"] = r ? r.unit : "";
+    }
+    return out;
+  }
+
   function buildCsv() {
     var v = {};
     SCALAR_IDS.forEach(function (id) { v[id] = $(id).value; });
@@ -953,6 +998,7 @@
       "サービス工事一覧": getSelectedServiceItems().join("\n"),
       "備考": v.memo
     });
+    Object.assign(cols, customItemCols(customItems, MAX_CUSTOM));
 
     var headers = Object.keys(cols);
     var headerLine = headers.map(csvField).join(",");
@@ -1067,7 +1113,7 @@
     YES_NO_CHECKBOX_IDS.forEach(function (id) { checks[id] = $(id).checked; });
     return {
       scalars: v, checks: checks, windows: windows, eaveGutters: eaveGutters, downGutters: downGutters, joints: joints,
-      serviceItems: getSelectedServiceItems()
+      customItems: customItems, serviceItems: getSelectedServiceItems()
     };
   }
   function applyDraft(draft) {
@@ -1084,7 +1130,8 @@
     eaveGutters = draft.eaveGutters || [];
     downGutters = draft.downGutters || [];
     joints = draft.joints || [];
-    renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList();
+    customItems = draft.customItems || [];
+    renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList(); renderCustomItemList();
     setSelectedServiceItems(draft.serviceItems);
     recalc();
   }
@@ -1185,7 +1232,7 @@
     var d = new Date();
     $("surveyDate").value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
-  renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList();
+  renderWindowList(); renderEaveGutterList(); renderDownGutterList(); renderJointList(); renderCustomItemList();
   recalc();
 })();
 </script>
