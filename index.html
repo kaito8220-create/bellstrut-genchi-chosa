@@ -361,7 +361,6 @@
           <select id="staff">
             <option value="">選択してください</option>
             <option>今宿清元</option>
-            <option>上野鈴太郎</option>
             <option>上野匡太郎</option>
           </select>
           <p class="err-msg" id="err-staff"></p>
@@ -653,6 +652,7 @@
       </div>
       <div class="summary-list">
         <div class="row"><span class="k">外周</span><span class="v" id="pvPerimeter">--</span></div>
+        <div class="row"><span class="k">外壁計算高さ</span><span class="v" id="pvWallH">--</span></div>
         <div class="row"><span class="k">外壁塗装面積</span><span class="v" id="pvWallArea">--</span></div>
         <div class="row"><span class="k">高圧洗浄面積</span><span class="v" id="pvWashArea">--</span></div>
         <div class="row"><span class="k">足場面積（目安）</span><span class="v" id="pvScaffoldArea">--</span></div>
@@ -680,8 +680,8 @@
   // 単価マスターの「サービス工事」区分と完全一致させること（Excel側の項目名と1文字でも違うと単価が引けなくなる）
   var SERVICE_ITEMS = [
     "軒天ボード張替え", "ベランダ屋根清掃", "外構高圧洗浄", "外壁補修", "屋根板金",
-    "軒樋清掃", "一階裏面の不用品回収", "バルコニー手摺清掃", "カーポート美装工事",
-    "門戸等洗浄", "カーポート脱着・洗浄"
+    "軒樋清掃", "一階部分不用品回収", "バルコニー手摺清掃", "カーポート美装工事",
+    "門戸等洗浄", "波板脱着・洗浄", "カーポート脱着・洗浄"
   ];
   var windows = [];
   var eaveGutters = [];
@@ -877,14 +877,18 @@
     openingArea = round2(openingArea);
     jointAroundOpenings = round2(jointAroundOpenings);
 
-    var wallArea = round2(perimeter * eaveH - openingArea);
+    // 外壁の高さ基準：頂点の高さ（最高高さ）が入力されていれば、軒天までの高さとの中間値を使う。
+    // 例：軒高7m・最高高さ9m → 8mで外壁面積を算出する。未入力・軒高以下なら軒天までの高さをそのまま使う。
+    var wallH = (peak > 0 && peak > eaveH) ? round2((eaveH + peak) / 2) : eaveH;
+    var wallArea = round2(perimeter * wallH - openingArea);
     if (wallArea < 0) wallArea = 0;
     var washArea = round2(wallArea + roofArea);
-    var scaffoldArea = round2(perimeter * (peak + 1.0));
+    // 足場高さ：最高高さ＋0.5m（2026-09-25に+1.0mから変更）
+    var scaffoldArea = round2(perimeter * (peak + 0.5));
 
     return {
       perimeter: perimeter, openingArea: openingArea, jointAroundOpenings: jointAroundOpenings,
-      wallArea: wallArea, washArea: washArea, scaffoldArea: scaffoldArea,
+      wallH: wallH, wallArea: wallArea, washArea: washArea, scaffoldArea: scaffoldArea,
       eaveGutterLen: sumLenCount(eaveGutters), downGutterLen: sumLenCount(downGutters), jointLen: sumLenCount(joints)
     };
   }
@@ -898,6 +902,7 @@
     $("subDownGutter").textContent = c.downGutterLen + " m";
     $("subJoint").textContent = c.jointLen + " m";
     $("pvPerimeter").textContent = c.perimeter > 0 ? c.perimeter + " m" : "--";
+    $("pvWallH").textContent = c.wallH > 0 ? c.wallH + " m" : "--";
     $("pvWallArea").textContent = c.wallArea > 0 ? c.wallArea + " m2" : "--";
     $("pvWashArea").textContent = c.washArea > 0 ? c.washArea + " m2" : "--";
     $("pvScaffoldArea").textContent = c.scaffoldArea > 0 ? c.scaffoldArea + " m2" : "--";
