@@ -423,11 +423,8 @@
           </select>
           <p class="err-msg" id="err-wallType2"></p>
         </div>
-        <div class="field span-2" id="floor1HeightField" hidden>
-          <label for="floor1Height">1階部分の高さ（材質の境目まで）<span class="req">必須</span></label>
-          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="floor1Height"><span>m</span></div>
-          <p class="field-note">地面から材質が切り替わる高さまで。残りが2階部分の高さになります（外壁計算高さ − この値）</p>
-          <p class="err-msg" id="err-floor1Height"></p>
+        <div class="field span-2" id="wallSplitHint" hidden>
+          <p class="field-note">1階部分の高さは「③建物の寸法」で入力してください</p>
         </div>
         <div class="field">
           <label for="roofType">屋根材質</label>
@@ -505,6 +502,40 @@
       </div>
 
       <div class="field-grid">
+        <div class="field span-2">
+          <label class="checkbox-item"><input type="checkbox" id="shapeSplit"><span>1階と2階で建物の形が違う（1階だけ張り出している等）</span></label>
+          <p class="field-note">2階が1階と同じ形で上に乗っている家（総2階）はチェック不要です</p>
+        </div>
+      </div>
+
+      <div id="floor2Shape" hidden>
+        <p class="group-title">2階部分の寸法</p>
+        <div class="field-grid">
+          <div class="field">
+            <label for="nagate2">2階の長手<span class="req">必須</span></label>
+            <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="nagate2"><span>m</span></div>
+            <p class="err-msg" id="err-nagate2"></p>
+          </div>
+          <div class="field">
+            <label for="kokute2">2階の短手<span class="req">必須</span></label>
+            <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="kokute2"><span>m</span></div>
+            <p class="err-msg" id="err-kokute2"></p>
+          </div>
+        </div>
+        <div class="calc-readout">
+          <span class="label">2階の外周（自動計算）</span>
+          <span class="value" id="calcPerimeter2">-- m</span>
+        </div>
+        <hr class="divider">
+      </div>
+
+      <div class="field-grid">
+        <div class="field span-2" id="floor1HeightField" hidden>
+          <label for="floor1Height">1階部分の高さ（1階と2階の境目まで）<span class="req">必須</span></label>
+          <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="floor1Height"><span>m</span></div>
+          <p class="field-note">地面から、材質または形が切り替わる高さまで。残りが2階部分の高さになります（外壁計算高さ − この値）</p>
+          <p class="err-msg" id="err-floor1Height"></p>
+        </div>
         <div class="field">
           <label for="peakHeight">頂点の高さ</label>
           <div class="unit-suffix"><input type="number" inputmode="decimal" step="0.01" min="0" id="peakHeight"><span>m</span></div>
@@ -719,11 +750,12 @@
         <h2>自動計算プレビュー</h2>
       </div>
       <div class="summary-list">
-        <div class="row"><span class="k">外周</span><span class="v" id="pvPerimeter">--</span></div>
+        <div class="row"><span class="k">外周（1階）</span><span class="v" id="pvPerimeter">--</span></div>
+        <div class="row" id="pvPerimeter2Row" hidden><span class="k">外周（2階）</span><span class="v" id="pvPerimeter2">--</span></div>
         <div class="row"><span class="k">外壁計算高さ</span><span class="v" id="pvWallH">--</span></div>
         <div class="row"><span class="k">外壁塗装面積</span><span class="v" id="pvWallArea">--</span></div>
-        <div class="row" id="pvWall1Row" hidden><span class="k">└ 1階（<span id="pvWall1Type">--</span>）</span><span class="v" id="pvWall1Area">--</span></div>
-        <div class="row" id="pvWall2Row" hidden><span class="k">└ 2階（<span id="pvWall2Type">--</span>）</span><span class="v" id="pvWall2Area">--</span></div>
+        <div class="row" id="pvWall1Row" hidden><span class="k">└ 1階<span id="pvWall1Type"></span></span><span class="v" id="pvWall1Area">--</span></div>
+        <div class="row" id="pvWall2Row" hidden><span class="k">└ 2階<span id="pvWall2Type"></span></span><span class="v" id="pvWall2Area">--</span></div>
         <div class="row"><span class="k">高圧洗浄面積</span><span class="v" id="pvWashArea">--</span></div>
         <div class="row"><span class="k">足場面積（目安）</span><span class="v" id="pvScaffoldArea">--</span></div>
       </div>
@@ -764,15 +796,19 @@
   var SCALAR_IDS = ["surveyDate","staff","customerName","address","memo","wallType","wallType2",
     "floor1Height","roofType","sealType",
     "roofPitch","eaveOverhang","buildingShape",
-    "nagate","kokute","peakHeight","eaveHeight","roofArea","doorWidth","doorHeight",
+    "nagate","kokute","nagate2","kokute2","peakHeight","eaveHeight","roofArea","doorWidth","doorHeight",
     "mizukiri","hafu","coolerSleeve","shutterBox","shutterLarge","shutterSmall","eaves",
     "tanbaHisashi","balconyLarge","balconyMedium","balconySmall",
     "balconyUrethaneLarge","balconyUrethaneMedium","balconyUrethaneSmall"];
 
   var YES_NO_CHECKBOX_IDS = ["ductBox", "gateDoor", "ironParts", "woodParts"];
 
-  // 1階と2階で外壁材質が違う家の対応（2026-10-10）。ONのときだけ2階の材質・境目の高さ・窓ごとの階を使う
+  // 1階と2階で外壁材質が違う家の対応（2026-10-10）。ONのときだけ2階の材質を使う
   function isWallSplit() { return $("wallTypeSplit").checked; }
+  // 1階と2階で建物の形が違う家の対応（2026-10-10）。ONのときだけ2階の外周を別に入力する
+  function isShapeSplit() { return $("shapeSplit").checked; }
+  // 外壁面積を階で分けて計算するか。材質が違う場合と形が違う場合のどちらでも分割が必要になる
+  function isFloorSplit() { return isWallSplit() || isShapeSplit(); }
   // 建物が4面の長方形でない家の対応（2026-10-10）。「その他」のときは辺の合計を外周とする
   function isShapeOther() { return $("buildingShape").value === "その他"; }
 
@@ -790,9 +826,9 @@
 
   function windowRowHtml(row) {
     var area = round2((num(row.w) * num(row.h) / 1000000) * num(row.n || 1));
-    // 階の選択は「1階と2階で外壁材質が違う」がONのときだけ出す（普段は入力項目を増やさない）
+    // 階の選択は「材質が違う」または「形が違う」がONのときだけ出す（普段は入力項目を増やさない）
     var floorField = "";
-    if (isWallSplit()) {
+    if (isFloorSplit()) {
       var f = row.floor === "2階" ? "2階" : "1階";
       floorField = '<div class="mini-field"><label>階</label><select data-field="floor">' +
         '<option value="1階"' + (f === "1階" ? " selected" : "") + '>1階</option>' +
@@ -970,7 +1006,13 @@
     var eaveH = num($("eaveHeight").value);
     var roofArea = num($("roofArea").value);
     // 外周：長方形なら従来どおり 2×(長手＋短手)。「その他」の形なら入力した辺の長さの合計。
+    // これは1階（建物の外周）の値。
     var perimeter = isShapeOther() ? sumSides() : round2(2 * (nagate + kokute));
+    // 2階の外周（2026-10-10追加）：1階だけ張り出している家は2階の外周が小さくなる。
+    // 「1階と2階で建物の形が違う」がOFFなら総2階として1階と同じ値を使う。
+    var perimeter2 = isShapeSplit()
+      ? round2(2 * (num($("nagate2").value) + num($("kokute2").value)))
+      : perimeter;
 
     // 開口部は全体・1階・2階の3通りで集計する。
     // 全体＝従来どおり外壁面積の控除と冊子廻りシールに使う。
@@ -998,27 +1040,38 @@
     // 例：軒高7m・最高高さ9m → 8mで外壁面積を算出する。未入力・軒高以下なら軒天までの高さをそのまま使う。
     var wallH = (peak > 0 && peak > eaveH) ? round2((eaveH + peak) / 2) : eaveH;
 
-    var split = isWallSplit();
+    // 外壁面積を階で分けるのは「材質が違う」または「形が違う」とき。
+    // 1階は1階の外周、2階は2階の外周を使う（総2階なら両方同じ値なので結果は従来と一致する）。
+    var split = isFloorSplit();
     var h1 = split ? num($("floor1Height").value) : 0;
     var h2 = split ? round2(wallH - h1) : 0;
     var wallArea1 = 0, wallArea2 = 0;
-    if (split && h1 > 0 && h2 > 0) {
+    var splitOk = split && h1 > 0 && h2 > 0;
+    if (splitOk) {
       wallArea1 = round2(perimeter * h1 - opening1F);
       if (wallArea1 < 0) wallArea1 = 0;
-      wallArea2 = round2(perimeter * h2 - opening2F);
+      wallArea2 = round2(perimeter2 * h2 - opening2F);
       if (wallArea2 < 0) wallArea2 = 0;
     }
-    var wallArea = (split && h1 > 0 && h2 > 0)
+    var wallArea = splitOk
       ? round2(wallArea1 + wallArea2)
       : round2(perimeter * wallH - openingArea);
     if (wallArea < 0) wallArea = 0;
 
     var washArea = round2(wallArea + roofArea);
-    // 足場高さ：最高高さ＋0.5m（2026-09-25に+1.0mから変更）
-    var scaffoldArea = round2(perimeter * (peak + 0.5));
+    // 足場高さ：最高高さ＋0.5m（2026-09-25に+1.0mから変更）。
+    // 最高高さは任意入力なので、未入力なら軒天までの高さで代用する（2026-10-10修正）。
+    // 以前は peak をそのまま使っていたため、最高高さが空欄だと 外周×0.5 というほぼ0の足場面積になっていた。
+    //
+    // 足場は1階の外周×全高で算出する。1階だけ張り出している家は実際には段差になるが、
+    // 張り出し部分の足場の積み方（どの高さまで組むか）を施工側に確認できていないため、
+    // 多め（安全側）に出るこの式を維持する。確認が取れたら段差を考慮した式に変更する。
+    var scaffoldH = (peak > 0 ? peak : eaveH) + 0.5;
+    var scaffoldArea = round2(perimeter * scaffoldH);
 
     return {
-      perimeter: perimeter, openingArea: openingArea, jointAroundOpenings: jointAroundOpenings,
+      perimeter: perimeter, perimeter2: perimeter2,
+      openingArea: openingArea, jointAroundOpenings: jointAroundOpenings,
       opening1F: opening1F, opening2F: opening2F,
       wallH: wallH, floor1H: h1, floor2H: h2,
       wallArea: wallArea, wallArea1: wallArea1, wallArea2: wallArea2,
@@ -1041,13 +1094,19 @@
     $("pvWashArea").textContent = c.washArea > 0 ? c.washArea + " m2" : "--";
     $("pvScaffoldArea").textContent = c.scaffoldArea > 0 ? c.scaffoldArea + " m2" : "--";
 
-    // 材質が階で違う場合は、材質別の面積（＝下塗りの数量）をプレビューに出す
-    var showSplit = isWallSplit() && c.wallArea1 > 0 && c.wallArea2 > 0;
+    // 2階の外周は、形が違う家のときだけ別行で出す
+    $("calcPerimeter2").textContent = c.perimeter2 > 0 ? c.perimeter2 + " m" : "-- m";
+    $("pvPerimeter2Row").hidden = !isShapeSplit();
+    $("pvPerimeter2").textContent = c.perimeter2 > 0 ? c.perimeter2 + " m" : "--";
+
+    // 階で分けて計算している場合は、階別の面積をプレビューに出す。
+    // 材質も違うならその材質名を、材質が同じなら「1階」「2階」だけを出す。
+    var showSplit = isFloorSplit() && c.wallArea1 > 0 && c.wallArea2 > 0;
     $("pvWall1Row").hidden = !showSplit;
     $("pvWall2Row").hidden = !showSplit;
     if (showSplit) {
-      $("pvWall1Type").textContent = $("wallType").value || "未選択";
-      $("pvWall2Type").textContent = $("wallType2").value || "未選択";
+      $("pvWall1Type").textContent = isWallSplit() ? "（" + ($("wallType").value || "未選択") + "）" : "";
+      $("pvWall2Type").textContent = isWallSplit() ? "（" + ($("wallType2").value || "未選択") + "）" : "";
       $("pvWall1Area").textContent = c.wallArea1 + " m2";
       $("pvWall2Area").textContent = c.wallArea2 + " m2";
     }
@@ -1057,9 +1116,17 @@
   function syncWallSplitUi() {
     var split = isWallSplit();
     $("wallType2Field").hidden = !split;
-    $("floor1HeightField").hidden = !split;
+    $("wallSplitHint").hidden = !split;
     $("wallTypeLabel").textContent = split ? "外壁材質（1階）" : "外壁材質";
+    // 1階高さは「材質が違う」「形が違う」のどちらでも必要
+    $("floor1HeightField").hidden = !isFloorSplit();
     renderWindowList();   // 窓行の「階」セレクトを出し入れする
+    recalc();
+  }
+  function syncShapeSplitUi() {
+    $("floor2Shape").hidden = !isShapeSplit();
+    $("floor1HeightField").hidden = !isFloorSplit();
+    renderWindowList();
     recalc();
   }
   function syncShapeUi() {
@@ -1076,6 +1143,7 @@
     recalc();
   }
   $("wallTypeSplit").addEventListener("change", syncWallSplitUi);
+  $("shapeSplit").addEventListener("change", syncShapeSplitUi);
   $("buildingShape").addEventListener("change", syncShapeUi);
 
   document.getElementById("formRoot").addEventListener("input", function (e) {
@@ -1090,6 +1158,7 @@
     wallType2: "2階の外壁材質を選択してください",
     floor1Height: "1階部分の高さを入力してください",
     nagate: "長手を入力してください", kokute: "短手を入力してください",
+    nagate2: "2階の長手を入力してください", kokute2: "2階の短手を入力してください",
     eaveHeight: "軒天までの高さを入力してください",
     roofArea: "屋根塗装面積（目測）を入力してください"
   };
@@ -1101,7 +1170,9 @@
     } else {
       ids.push("nagate", "kokute");
     }
-    if (isWallSplit()) ids.push("wallType2", "floor1Height");
+    if (isWallSplit()) ids.push("wallType2");
+    if (isShapeSplit()) ids.push("nagate2", "kokute2");
+    if (isFloorSplit()) ids.push("floor1Height");
     return ids;
   }
   function validate() {
@@ -1151,8 +1222,8 @@
       return false;
     }
 
-    // 材質が階で違う場合：1階の高さが外壁計算高さ以上だと2階分が0以下になり、下塗りが片方しか出ない
-    if (isWallSplit()) {
+    // 階で分けて計算する場合：1階の高さが外壁計算高さ以上だと2階分が0以下になり、面積が片方しか出ない
+    if (isFloorSplit()) {
       var c = computeAll();
       if (c.floor1H >= c.wallH) {
         $("floor1Height").closest(".field").classList.add("has-error");
@@ -1218,6 +1289,8 @@
 
     var c = computeAll();
     var split = isWallSplit();
+    var fsplit = isFloorSplit();
+    var ssplit = isShapeSplit();
     var other = isShapeOther();
 
     var cols = {
@@ -1226,7 +1299,8 @@
       // 2階の材質・境目の高さは「1階と2階で材質が違う」がONのときだけ出す。
       // 空欄なら見積スクリプトは従来どおり1材質として処理する。
       "外壁材質2階": split ? v.wallType2 : "",
-      "1階高さm": split ? v.floor1Height : "",
+      // 1階高さは材質・形のどちらの分割でも必要
+      "1階高さm": fsplit ? v.floor1Height : "",
       // 空欄なら見積スクリプトが従来どおり外壁材質から自動判定する
       "シール材質": v.sealType,
       "屋根材質": v.roofType, "勾配": v.roofPitch, "軒の出mm": v.eaveOverhang,
@@ -1236,10 +1310,13 @@
       "辺一覧": other ? buildSideListText() : "",
       // 外周は算出済みの値をそのまま渡す。スクリプトはこの値があれば優先して使う
       "外周m": c.perimeter > 0 ? c.perimeter : "",
+      // 2階の外周。1階と同じ形（総2階）なら空欄にして、スクリプト側で1階の値を使わせる
+      "2階外周m": ssplit && c.perimeter2 > 0 ? c.perimeter2 : "",
+      "2階長手m": ssplit ? v.nagate2 : "", "2階短手m": ssplit ? v.kokute2 : "",
       "頂点の高さm": v.peakHeight, "軒天までの高さm": v.eaveHeight,
       "屋根塗装面積m2": v.roofArea,
       "窓一覧": buildWindowListText(),
-      "窓一覧2階": split ? buildWindowListText("2階") : "",
+      "窓一覧2階": fsplit ? buildWindowListText("2階") : "",
       "玄関ドア_幅mm": v.doorWidth, "玄関ドア_高さmm": v.doorHeight
     };
     Object.assign(cols, gutterCols("軒樋", eaveGutters, MAX_GUTTER));
@@ -1371,7 +1448,8 @@
     var checks = {};
     YES_NO_CHECKBOX_IDS.forEach(function (id) { checks[id] = $(id).checked; });
     return {
-      scalars: v, checks: checks, wallTypeSplit: $("wallTypeSplit").checked,
+      scalars: v, checks: checks,
+      wallTypeSplit: $("wallTypeSplit").checked, shapeSplit: $("shapeSplit").checked,
       windows: windows, sides: sides, eaveGutters: eaveGutters, downGutters: downGutters, joints: joints,
       customItems: customItems, serviceItems: getSelectedServiceItems()
     };
@@ -1387,6 +1465,7 @@
       if (el) el.checked = !!draft.checks[id];
     });
     $("wallTypeSplit").checked = !!draft.wallTypeSplit;
+    $("shapeSplit").checked = !!draft.shapeSplit;
     windows = draft.windows || [];
     sides = draft.sides || [];
     eaveGutters = draft.eaveGutters || [];
@@ -1395,8 +1474,10 @@
     customItems = draft.customItems || [];
     // 表示の出し入れを先に済ませてから各リストを描画する（窓行の「階」セレクトの有無が決まるため）
     $("wallType2Field").hidden = !isWallSplit();
-    $("floor1HeightField").hidden = !isWallSplit();
+    $("wallSplitHint").hidden = !isWallSplit();
     $("wallTypeLabel").textContent = isWallSplit() ? "外壁材質（1階）" : "外壁材質";
+    $("floor2Shape").hidden = !isShapeSplit();
+    $("floor1HeightField").hidden = !isFloorSplit();
     $("shapeRect").hidden = isShapeOther();
     $("shapeOther").hidden = !isShapeOther();
     $("roofAreaReq").hidden = !isShapeOther();
